@@ -8,6 +8,7 @@ itsdangerous==0.24
 Jinja2==2.8
 MarkupSafe==0.23
 pathlib2==2.1.0
+pbr==1.9.1
 pexpect==4.0.1
 pickleshare==0.7.2
 pkg-resources==0.0.0
@@ -15,5 +16,9 @@ ptyprocess==0.5.1
 requests==2.10.0
 simplegeneric==0.8.1
 six==1.10.0
+stevedore==1.12.0
 traitlets==4.2.1
+virtualenv==15.0.1
+virtualenv-clone==0.2.6
+virtualenvwrapper==4.7.1
 Werkzeug==0.11.9

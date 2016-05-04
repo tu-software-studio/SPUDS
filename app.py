@@ -1,11 +1,13 @@
-from flask import Flask, request, abort
-from dockerhubclient import DockerhubClient
 import json, re
+from subprocess import call
 
+from flask import Flask, request, abort
+
+from dockerhubclient import DockerhubClient
 
 app = Flask(__name__)
 
-ALLOWED_COMMITTERS = ['benaduggan']
+ALLOWED_COMMITTERS = ['benaduggan', 'baxterthehacker']
 ENV = 'staging'
 
 # @app.route('/deploy/codeship',methods=['POST'])
@@ -56,6 +58,7 @@ def deploy_api(tag):
     client = DockerhubClient()
     if client.check_if_tag_exists(tag):
         print "\n\n DEPLOYING APP WITH TAG VERSION: {}\n\n".format(tag)
+        rc = call("../tinyhands/run.sh {}".format(tag), shell=True)
     else:
         abort(404)
 
