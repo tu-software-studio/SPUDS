@@ -10,32 +10,29 @@ app = Flask(__name__)
 ALLOWED_COMMITTERS = ['benaduggan', 'baxterthehacker']
 ENV = 'staging'
 
-# @app.route('/deploy/codeship',methods=['POST'])
-# def deploy_codeship():
-#    """
-#    this is specifically for the codeship deployment process
-#    It will probably only work for the client for awhile
-#
-#    The json object should be as follows:
-#    {
-#         "environment": "<staging|production>",
-#         "app":"<client|api>",
-#         "tag":"<empty|build-number>"
-#    }
-#    """
-#
-#    data = json.loads(request.data)
-#    environment = data['environment']
-#    app = data['app']
-#    tag = data['tag']
-#
-#    print "Env: {} App: {} Tag: {}".format(environment, app, tag)
-#
-#    deploy_api(tag)
-#
-#    return 'OK'
+@app.route('/deploy/api',methods=['POST'])
+def deploy_codeship():
+   """
+   this is for someone who wants to directly deploy onto the server
 
-@app.route('/deploy/github',methods=['POST'])
+   The json object should be as follows:
+   {
+        "environment": "<staging|production>",
+        "tag":"<empty|build-number>"
+   }
+   """
+   data = json.loads(request.data)
+   environment = data['environment']
+   tag = data['tag']
+
+   print "Request to deploy the api"
+   print "Env: {} Tag: {}".format(environment, tag)
+
+   if deploy_api(tag):
+      return 'OK'
+   abort(500)
+
+@app.route('/deploy/api/github',methods=['POST'])
 def deploy_commit_message():
    data = json.loads(request.data)
    committer = data['head_commit']['committer']['username']
@@ -58,7 +55,8 @@ def deploy_api(tag):
     client = DockerhubClient()
     if client.check_if_tag_exists(tag):
         print "\n\n DEPLOYING APP WITH TAG VERSION: {}\n\n".format(tag)
-        rc = call("../tinyhands/deploy.sh {}".format(tag), shell=True)
+        cmd = call("../tinyhands/deploy.sh {}".format(tag), shell=True)
+        return True
     else:
         abort(404)
 
