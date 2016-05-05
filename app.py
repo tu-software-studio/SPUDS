@@ -58,7 +58,7 @@ def deploy_api(tag):
     client = DockerhubClient()
     if client.check_if_tag_exists(tag):
         print "\n\n DEPLOYING APP WITH TAG VERSION: {}\n\n".format(tag)
-        rc = call("../tinyhands/run.sh {}".format(tag), shell=True)
+        rc = call("../tinyhands/deploy.sh {}".format(tag), shell=True)
     else:
         abort(404)
 
