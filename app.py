@@ -27,14 +27,18 @@ def deploy():
    data = json.loads(request.data)
    environment = data['environment']
    tag = data['tag']
+   secret = data['secret']
 
    print "Request to deploy the api"
    print "Env: {} Tag: {}".format(environment, tag)
 
-   if deploy_api(tag):
-       write_tag(tag)
-       return 'OK'
-   abort(500)
+   if secret == API_SECRET:
+      if deploy_api(tag):
+         write_tag(tag)
+         return 'OK'
+      abort(500)
+   else:
+      abort(401)
 
 @app.route('/deploy/api/github',methods=['POST'])
 def deploy_from_github_commit():
@@ -80,8 +84,12 @@ def deploy_api(tag):
     else:
         abort(404)
 
+import ssl
+context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+context.load_cert_chain(SSL_CERT_PATH, SSL_KEY_PATH)
+
 if __name__ == '__main__':
     if ENVIRONMENT == "local":
         app.run(host='0.0.0.0')
     elif ENVIRONMENT == "staging":
-        app.run(host='0.0.0.0', ssl_context=(SSL_CERT_PATH, SSL_KEY_PATH))
+        app.run(host='0.0.0.0', ssl_context=context)
