@@ -9,8 +9,6 @@ from settings import *
 
 app = Flask(__name__)
 
-ALLOWED_COMMITTERS = ['benaduggan', 'baxterthehacker']
-ENV = 'staging'
 
 @app.route('/deploy/api',methods=['POST'])
 def deploy():
@@ -34,7 +32,6 @@ def deploy():
 
    if secret == API_SECRET:
       if deploy_api(tag):
-         write_tag(tag)
          return 'OK'
       abort(500)
    else:
@@ -52,7 +49,7 @@ def deploy_from_github_commit():
 
         deploy_req = re.search('deploy\((?P<env>staging|production),\s(?P<tag>\d+)\)', message)
         if committer in ALLOWED_COMMITTERS:
-          if deploy_req and deploy_req.group('env') == ENV and deploy_req.group('tag'):
+          if deploy_req and deploy_req.group('env') == ENVIRONMENT and deploy_req.group('tag'):
              deploy_api(deploy_req.group('tag'))
              return "OK"
 
@@ -80,16 +77,17 @@ def deploy_api(tag):
         print "\n\n DEPLOYING APP WITH TAG VERSION: {}\n\n".format(tag)
         cmd = call(DEPLOY_SCRIPT_PATH + " {}".format(tag), shell=True)
         # cmd = Popen(["../tinyhands/deploy.sh", tag])
+        write_tag(tag)
         return True
     else:
         abort(404)
 
-import ssl
-context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-context.load_cert_chain(SSL_CERT_PATH, SSL_KEY_PATH)
 
 if __name__ == '__main__':
     if ENVIRONMENT == "local":
         app.run(host='0.0.0.0')
     elif ENVIRONMENT == "staging":
+        import ssl
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context.load_cert_chain(SSL_CERT_PATH, SSL_KEY_PATH)
         app.run(host='0.0.0.0', ssl_context=context)
