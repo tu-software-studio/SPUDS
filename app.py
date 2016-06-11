@@ -22,6 +22,7 @@ def deploy():
         "secret": "<shared secret>"
    }
    """
+   print "test"
    data = json.loads(request.data)
    environment = data['environment']
    tag = data['tag']
@@ -80,13 +81,14 @@ def deploy_api(tag):
         write_tag(tag)
         return True
     else:
+        print "tag not found"
         abort(404)
 
 
 if __name__ == '__main__':
     if ENVIRONMENT == "local":
         app.run(host='0.0.0.0')
-    elif ENVIRONMENT == "staging":
+    elif ENVIRONMENT == "staging" or ENVIRONMENT == "production":
         import ssl
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         context.load_cert_chain(SSL_CERT_PATH, SSL_KEY_PATH)
